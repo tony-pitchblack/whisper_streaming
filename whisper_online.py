@@ -31,7 +31,22 @@ class ASRBase:
     sep = " "   # join transcribe words with this character (" " for whisper_timestamped,
                 # "" for faster-whisper because it emits the spaces when neeeded)
 
-    def __init__(self, lan, modelsize=None, cache_dir=None, model_dir=None, logfile=sys.stderr, device='cuda', compute_type='float16'):
+    def __init__(self, lan, modelsize=None, cache_dir=None, model_dir=None, logfile=sys.stderr, device='cuda', compute_type='default'):
+        assert device in ['cpu', 'cuda']
+
+        AVAILABLE_COMPUTE_TYPES = [
+            "int8",
+            "int8_float32",
+            "int8_float16",
+            "int8_bfloat16",
+            "int16",
+            "float16",
+            "bfloat16",
+            "float32"
+        ]
+
+        assert compute_type in AVAILABLE_COMPUTE_TYPES
+
         self.logfile = logfile
 
         self.transcribe_kargs = {}
@@ -109,11 +124,8 @@ class FasterWhisperASR(ASRBase):
         cache_dir=None, 
         model_dir=None, 
         device='cuda', 
-        compute_type="float16"
+        compute_type="default"
     ):
-
-        assert device in ['cpu', 'cuda']
-        # assert compute_type in ['float16', 'int8_float16', 'int8']
 
         from faster_whisper import WhisperModel
 #        logging.getLogger("faster_whisper").setLevel(logger.level)
