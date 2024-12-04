@@ -670,6 +670,18 @@ def add_shared_args(parser):
     parser.add_argument('--buffer_trimming', type=str, default="segment", choices=["sentence", "segment"],help='Buffer trimming strategy -- trim completed sentences marked with punctuation mark and detected by sentence segmenter, or the completed segments returned by Whisper. Sentence segmenter must be installed for "sentence" option.')
     parser.add_argument('--buffer_trimming_sec', type=float, default=15, help='Buffer trimming length threshold in seconds. If buffer length is longer, trimming sentence/segment is triggered.')
     parser.add_argument("-l", "--log-level", dest="log_level", choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help="Set the log level", default='DEBUG')
+    parser.add_argument(
+        "--device", 
+        choices=['cpu', 'cuda'], 
+        default='cpu', 
+        help="Device to run the model on (default: 'cpu')"
+    )
+    parser.add_argument(
+        "--compute_type", 
+        choices=['float16', 'int8_float16', 'int8'], 
+        default='float16', 
+        help="Compute type to use (default: 'float16')"
+    )
 
 def asr_factory(args, logfile=sys.stderr):
     """
@@ -689,7 +701,7 @@ def asr_factory(args, logfile=sys.stderr):
         size = args.model
         t = time.time()
         logger.info(f"Loading Whisper {size} model for {args.lan}...")
-        asr = asr_cls(modelsize=size, lan=args.lan, cache_dir=args.model_cache_dir, model_dir=args.model_dir)
+        asr = asr_cls(modelsize=size, lan=args.lan, cache_dir=args.model_cache_dir, model_dir=args.model_dir, device=args.device, compute_type=args.compute_type)
         e = time.time()
         logger.info(f"done. It took {round(e-t,2)} seconds.")
 
